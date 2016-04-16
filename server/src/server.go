@@ -1,11 +1,16 @@
 package main
  
-import "udpServer"
-
+import (
+	"udpServer"
+	"game"
+)
 
 
 func main() {
 	
-    defer udpServer.Stop()
 	udpServer.Start()
+	defer udpServer.Stop()
+	
+	//defer game.Stop()
+	game.Start()
 }

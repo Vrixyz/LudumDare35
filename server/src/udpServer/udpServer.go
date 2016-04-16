@@ -4,8 +4,6 @@ import (
     "fmt"
     "net"
     "os"
-	"time"
-	"encoding/json"
 	"strings"
 )
 
@@ -19,8 +17,6 @@ func CheckError(err error) {
         os.Exit(0)
     }
 }
- 
-var player map[string]interface{}
 
 var clients []*net.UDPConn
 
@@ -80,12 +76,6 @@ func maybeNewClient(addr *net.UDPAddr) {
 }
 
 func Start() {
-	player = map[string]interface{}{
-		"name": "Vrixyz",
-		"position": map[string]interface{}{
-			"x": 1,
-			"y": 2},
-    }
 	
     /* Lets prepare a address at any address at port 10003*/   
     ServerAddr,err := net.ResolveUDPAddr("udp",":10003")
@@ -109,19 +99,4 @@ func Start() {
 			maybeNewClient(addr); // TODO: goroutine to avoid packet loss
 		}
 	}(ServerAddr)
-	
-    i := 0
-    for {
-        i++
-		//player.time = i
-        buf, err := json.Marshal(player)
-		if (err != nil) {
-			fmt.Println("Couldn't marshall player", err)
-		} else {
-			fmt.Println(player)
-			//fmt.Println(buf)
-			Broadcast(buf)
-		}
-        time.Sleep(time.Second * 1)
-    }
 }
