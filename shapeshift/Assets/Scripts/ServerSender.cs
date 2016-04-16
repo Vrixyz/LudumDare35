@@ -13,7 +13,6 @@
         // todo: shutdown thread at the end
 */
 using UnityEngine;
-using System.Collections;
  
 using System;
 using System.Text;

@@ -1,12 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Globalization;
+using System.Text;
+using System;
+
 
 public class ServerHelperGUI : MonoBehaviour {
     ServerHelper serverHelper = new ServerHelper();
-    ServerListener serverListener = new ServerListener();
 
     // gui
     string strMessage = "{\"Xspeed\":1}";
+
+    // infos
+    public string lastReceivedUDPPacket = "";
+    public string allReceivedUDPPackets = ""; // clean up this from time to time!
 
     // Use this for initialization
     void Start () {
@@ -16,8 +23,17 @@ public class ServerHelperGUI : MonoBehaviour {
     // Use this for initialization
     void init()
     {
+        serverHelper.onReceivePlayersDelegate = (playersMessage) =>
+        {
+            string players = JsonUtility.ToJson(playersMessage);
+            print(">> " + players);
+            // latest UDPpacket
+            lastReceivedUDPPacket = players;
+
+            // ....
+            allReceivedUDPPackets = allReceivedUDPPackets + " ; " + players;
+        };
         serverHelper.init();
-        serverListener.init();
     }
 
     // OnGUI
@@ -28,7 +44,7 @@ public class ServerHelperGUI : MonoBehaviour {
         Rect rectObj = new Rect(40, 380, 200, 400);
         GUIStyle style = new GUIStyle();
         style.alignment = TextAnchor.UpperLeft;
-        GUI.Box(rectObj, "# UDPSend-Data\n" + serverHelper.ip + ":" + serverHelper.port + " #\n"
+        GUI.Box(rectObj, "# UDPSend-Data\n" + serverHelper.ip + ":" + serverHelper.sendPort + " #\n"
                 , style);
         // ------------------------
         // send it
@@ -44,10 +60,21 @@ public class ServerHelperGUI : MonoBehaviour {
         
         Rect rectObj2 = new Rect(40, 10, 200, 400);
         style.alignment = TextAnchor.UpperLeft;
-        GUI.Box(rectObj2, "# UDPReceive\n" + serverHelper.ip + ":" + serverListener.port + " #\n"
-                    + "shell> nc -u " + serverListener.ip + ":" + serverListener.port + " \n"
-                    + "\nLast Packet: \n" + serverListener.lastReceivedUDPPacket
-                    + "\n\nAll Messages: \n" + serverListener.allReceivedUDPPackets
+        GUI.Box(rectObj2, "# UDPReceive\n" + serverHelper.ip + ":" + serverHelper.listenPort + " #\n"
+                    + "shell> nc -u " + serverHelper.ip + ":" + serverHelper.listenPort + " \n"
+                    + "\nLast Packet: \n" + lastReceivedUDPPacket
+                    + "\n\nAll Messages: \n" + allReceivedUDPPackets
                 , style);
+    }
+    // getLatestUDPPacket
+    // cleans up the rest
+    public string getLatestUDPPacket()
+    {
+        allReceivedUDPPackets = "";
+        return lastReceivedUDPPacket;
+    }
+    public void OnApplicationQuit()
+    {
+        serverHelper.stop();
     }
 }
