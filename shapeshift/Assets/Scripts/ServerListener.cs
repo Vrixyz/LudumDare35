@@ -9,7 +9,7 @@ using System.Threading;
 
 public class ServerListener : MonoBehaviour {
 
-    // receiving Thread
+   /* // receiving Thread
     Thread receiveThread;
 
     // udpclient object
@@ -123,5 +123,5 @@ public class ServerListener : MonoBehaviour {
     {
         allReceivedUDPPackets = "";
         return lastReceivedUDPPacket;
-    }
+    }*/
 }
