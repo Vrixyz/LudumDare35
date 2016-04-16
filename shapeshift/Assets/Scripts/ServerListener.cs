@@ -15,6 +15,12 @@ public class ServerListener : MonoBehaviour {
         public string name;
         public Vector2 position;
     }
+	[Serializable]
+    public class ObjectMessage
+    {
+		public string time;
+        public Player[] players;
+    }
 
     // receiving Thread
     Thread receiveThread;

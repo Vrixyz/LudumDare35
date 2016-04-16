@@ -28,33 +28,40 @@ var keepAlive [] time.Time // time last update
 func Stop() {
 	// TODO: thread safe
 	for i := range clients {
-        clients[i].Close()
+		if (clients[i] != nil) {
+			clients[i].Close()
+			clients[i] = nil
+		}
     }
 }
 
 func Broadcast(buf []byte) {
 	// TODO: thread safe
 	for i:= range clients {
-		fmt.Println("sending: ", i)
-		_,err := clients[i].Write(buf)
-		if err != nil {
-			fmt.Println(buf, err)
+		if (clients[i] != nil) {
+			fmt.Println("sending: ", i, " for: ", clients[i].RemoteAddr())
+			_,err := clients[i].Write(buf)
+			if err != nil {
+				fmt.Println(buf, err)
+			}
 		}
 	}
 }
 
 func extend(slice []*net.UDPConn, element *net.UDPConn) ([]*net.UDPConn, int) {
     n := len(slice)
-	placeFound := 0//range clients
-	//for placeFound {
-	//	if clients[i] == nil {
-	//		break
-	//	}
-	//}
+	placeFound := n
+	for i := range clients {
+		if clients[i] == nil {
+			placeFound = i
+			break
+		}
+	}
 	fmt.Println("placeFound:", placeFound)
 	if (placeFound == n) {
 		n := len(slice)
 		if n == cap(slice) {
+			fmt.Println("must grow")
 			// Slice is full; must grow.
 			// We double its size and add 1, so if the size is zero we still grow.
 			newCap := 2*n+1
@@ -66,25 +73,32 @@ func extend(slice []*net.UDPConn, element *net.UDPConn) ([]*net.UDPConn, int) {
 			keepAlive = newKeepAlive
 		}
 		slice = slice[0 : n+1]
-		
+		keepAlive = keepAlive[0 : n+1]
+	}
+	fmt.Println(placeFound)
+	fmt.Println("keepAlive: ", keepAlive[0])
     slice[placeFound] = element
-    return slice, n
+    return slice, placeFound
 }
 
-func deleteClient(int id) {
-	
+func deleteClient(id int) {
+	LostConnectionCallback(id)
+	clients[id].Close()
+	clients[id] = nil
 }
 
 func maybeNewClient(addr *net.UDPAddr) {
 	// TODO: handle thrade safe
 	addrSimple := strings.Split(addr.String(), ":")[0];
 	for i:= range clients {
-		clientSimpleAddr := strings.Split(clients[i].RemoteAddr().String(), ":")[0]
-		fmt.Println("addr: ", addrSimple , " ; client[", i, "]: ", clientSimpleAddr)
-		if (addrSimple == clientSimpleAddr) {
-			fmt.Println("not a new client.")
-			// TODO: refresh the keep-alive
-			return // we already saved this client
+		if (clients[i] != nil) {
+			clientSimpleAddr := strings.Split(clients[i].RemoteAddr().String(), ":")[0]
+			fmt.Println("addr: ", addrSimple , " ; client[", i, "]: ", clientSimpleAddr)
+			if (addrSimple == clientSimpleAddr) {
+				fmt.Println("not a new client.")
+				keepAlive[i] = time.Now()
+				return // we already saved this client
+			}
 		}
 	}
 	fmt.Println("new client!");
@@ -126,13 +140,16 @@ func Start() {
 	}(ServerAddr)
 	
 	go func() {
-		timeout := time.Second * 30
+		timeout := time.Second * 5
 		for {
 			now := time.Now()
 			// TODO: thread safe
 			for i := range clients {
-				if (now.Sub(keepAlive[i]) > timeout) {
-					deleteClient(i)
+				if (clients[i] != nil) {
+					fmt.Println(now.Sub(keepAlive[i]))
+					if (now.Sub(keepAlive[i]) > timeout) {
+						deleteClient(i)
+					}
 				}
 			}
 			time.Sleep(timeout)

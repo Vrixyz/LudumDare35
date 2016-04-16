@@ -46,11 +46,15 @@ func Start() {
     for {
         i++
 		// TODO: thread safe (read)
-        buf, err := json.Marshal(players)
+		data := map[string]interface{}{
+				"players": players,
+				"time": time.Now(),
+			}
+        buf, err := json.Marshal(data)
 		if (err != nil) {
 			fmt.Println("Couldn't marshall player", err)
 		} else {
-			fmt.Println(players)
+			fmt.Println(data)
 			//fmt.Println(buf)
 			udpServer.Broadcast(buf)
 		}
