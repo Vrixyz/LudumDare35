@@ -3,13 +3,14 @@ package game
 import (
 	"fmt"
 	"encoding/json"
-	"udpServer"
 	"time"
+	"udpServer"
+	"game/maze"
 )
 
 type Vector2 struct {
-	X float32
-	Y float32
+	X float64
+	Y float64
 }
 
 type Player struct {
@@ -23,8 +24,8 @@ type Player struct {
 var players []Player
 
 type MoveMessage struct {
-    XSpeed    float32
-    YSpeed    float32
+    XSpeed    float64
+    YSpeed    float64
 }
 
 func PlayerMessage(id int, body []byte) {
@@ -87,7 +88,7 @@ func LostPlayer(id int) {
 }
 
 func Start() {
-	
+	maze.Parse("maps/exampleMap.txt")
 	// goroutine send data to players
     go func () {
 		for {
@@ -116,8 +117,8 @@ func Start() {
 		for i := range players {
 			// TODO: optimize this shit
 			fmt.Println("moving: ", players[i])
-			players[i].Position.X = players[i].Position.X + (players[i].Speed.X * float32(elapsedTime.Seconds()))
-			players[i].Position.Y = players[i].Position.Y + (players[i].Speed.Y * float32(elapsedTime.Seconds()))
+			players[i].Position.X = players[i].Position.X + (players[i].Speed.X * float64(elapsedTime.Seconds()))
+			players[i].Position.Y = players[i].Position.Y + (players[i].Speed.Y * float64(elapsedTime.Seconds()))
 		}
 		time.Sleep(time.Millisecond * 200)
 	}
