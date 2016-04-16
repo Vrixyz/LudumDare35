@@ -5,9 +5,11 @@ import (
     "net"
     "os"
 	"strings"
+	"time"
 )
 
-// TODO: add players here
+var NewConnectionCallback func(int)
+var LostConnectionCallback func(int)
 
 
 /* A Simple function to verify error */
@@ -19,7 +21,10 @@ func CheckError(err error) {
 }
 
 var clients []*net.UDPConn
+var keepAlive [] time.Time // time last update
 
+
+/// Very important so my sockets stay valid..
 func Stop() {
 	// TODO: thread safe
 	for i := range clients {
@@ -38,19 +43,36 @@ func Broadcast(buf []byte) {
 	}
 }
 
-func extend(slice []*net.UDPConn, element *net.UDPConn) []*net.UDPConn {
+func extend(slice []*net.UDPConn, element *net.UDPConn) ([]*net.UDPConn, int) {
     n := len(slice)
-    if n == cap(slice) {
-        // Slice is full; must grow.
-        // We double its size and add 1, so if the size is zero we still grow.
+	placeFound := 0//range clients
+	//for placeFound {
+	//	if clients[i] == nil {
+	//		break
+	//	}
+	//}
+	fmt.Println("placeFound:", placeFound)
+	if (placeFound == n) {
+		n := len(slice)
+		if n == cap(slice) {
+			// Slice is full; must grow.
+			// We double its size and add 1, so if the size is zero we still grow.
+			newCap := 2*n+1
+			newSlice := make([]*net.UDPConn, n, newCap)
+			copy(newSlice, slice)
+			slice = newSlice
+			newKeepAlive := make([]time.Time, n, newCap)
+			copy(newKeepAlive, keepAlive)
+			keepAlive = newKeepAlive
+		}
+		slice = slice[0 : n+1]
 		
-		newSlice := make([]*net.UDPConn, n, 2*n+1)
-        copy(newSlice, slice)
-        slice = newSlice
-    }
-    slice = slice[0 : n+1]
-    slice[n] = element
-    return slice
+    slice[placeFound] = element
+    return slice, n
+}
+
+func deleteClient(int id) {
+	
 }
 
 func maybeNewClient(addr *net.UDPAddr) {
@@ -72,7 +94,10 @@ func maybeNewClient(addr *net.UDPAddr) {
 	CheckError(err)
 	Conn, err := net.DialUDP("udp", LocalAddr, addr)
 	CheckError(err)
-	clients = extend(clients, Conn)
+	newLen := 0
+	clients, newLen = extend(clients, Conn)
+	keepAlive[newLen] = time.Now()
+	NewConnectionCallback(newLen)
 }
 
 func Start() {
@@ -99,4 +124,18 @@ func Start() {
 			maybeNewClient(addr); // TODO: goroutine to avoid packet loss
 		}
 	}(ServerAddr)
+	
+	go func() {
+		timeout := time.Second * 30
+		for {
+			now := time.Now()
+			// TODO: thread safe
+			for i := range clients {
+				if (now.Sub(keepAlive[i]) > timeout) {
+					deleteClient(i)
+				}
+			}
+			time.Sleep(timeout)
+		}
+	}()
 }
