@@ -139,4 +139,18 @@ public class ServerListener : MonoBehaviour {
         allReceivedUDPPackets = "";
         return lastReceivedUDPPacket;
     }
+	
+	public void OnApplicationQuit()
+     {
+        // end of application
+        if (receiveThread != null)
+        { 
+			receiveThread.Abort();
+			if (client != null) {
+				client.Close();
+			}
+        }
+  
+        print("Stop"); 
+     } 
 }
