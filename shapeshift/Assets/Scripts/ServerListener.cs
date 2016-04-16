@@ -9,7 +9,14 @@ using System.Threading;
 
 public class ServerListener : MonoBehaviour {
 
-   /* // receiving Thread
+    [Serializable]
+    public class Player
+    {
+        public string name;
+        public Vector2 position;
+    }
+
+    // receiving Thread
     Thread receiveThread;
 
     // udpclient object
@@ -27,7 +34,8 @@ public class ServerListener : MonoBehaviour {
     // start from shell
     private static void Main()
     {
-        UDPReceive receiveObj = new UDPReceive();
+        
+        ServerListener receiveObj = new ServerListener();
         receiveObj.init();
 
         string text = "";
@@ -64,7 +72,7 @@ public class ServerListener : MonoBehaviour {
         print("UDPSend.init()");
 
         // define port
-        port = 8051;
+        port = 10002;
 
         // status
         print("Sending to 127.0.0.1 : " + port);
@@ -102,7 +110,8 @@ public class ServerListener : MonoBehaviour {
 
                 // Den abgerufenen Text anzeigen.
                 print(">> " + text);
-
+                Player player = JsonUtility.FromJson<Player>(text);
+                print(">> " + player.name);
                 // latest UDPpacket
                 lastReceivedUDPPacket = text;
 
@@ -123,5 +132,5 @@ public class ServerListener : MonoBehaviour {
     {
         allReceivedUDPPackets = "";
         return lastReceivedUDPPacket;
-    }*/
+    }
 }

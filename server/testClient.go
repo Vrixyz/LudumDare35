@@ -40,7 +40,7 @@ func main() {
 		}
 	}(ServerAddr)
 	
-	ClientAddr,err := net.ResolveUDPAddr("udp","127.0.0.1:10001")
+	ClientAddr,err := net.ResolveUDPAddr("udp","127.0.0.1:10003")
     CheckError(err)
  
     LocalAddr, err := net.ResolveUDPAddr("udp", "127.0.0.1:0")

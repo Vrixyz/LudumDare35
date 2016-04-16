@@ -1,1 +1,4 @@
-sceneSetups: []
+sceneSetups:
+- path: Assets/serverTest.unity
+  isLoaded: 1
+  isActive: 1
