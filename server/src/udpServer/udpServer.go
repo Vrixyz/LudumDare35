@@ -10,6 +10,7 @@ import (
 
 var NewConnectionCallback func(int)
 var LostConnectionCallback func(int)
+var MessageReceivedCallback func(int, []byte)
 
 
 /* A Simple function to verify error */
@@ -87,7 +88,7 @@ func deleteClient(id int) {
 	clients[id] = nil
 }
 
-func maybeNewClient(addr *net.UDPAddr) {
+func maybeNewClient(addr *net.UDPAddr) int {
 	// TODO: handle thrade safe
 	addrSimple := strings.Split(addr.String(), ":")[0];
 	for i:= range clients {
@@ -97,7 +98,7 @@ func maybeNewClient(addr *net.UDPAddr) {
 			if (addrSimple == clientSimpleAddr) {
 				fmt.Println("not a new client.")
 				keepAlive[i] = time.Now()
-				return // we already saved this client
+				return i // we already saved this client
 			}
 		}
 	}
@@ -112,6 +113,7 @@ func maybeNewClient(addr *net.UDPAddr) {
 	clients, newLen = extend(clients, Conn)
 	keepAlive[newLen] = time.Now()
 	NewConnectionCallback(newLen)
+	return newLen
 }
 
 func Start() {
@@ -135,7 +137,8 @@ func Start() {
 			if err != nil {
 				fmt.Println("Error: ",err)
 			}
-			maybeNewClient(addr); // TODO: goroutine to avoid packet loss
+			id := maybeNewClient(addr); // TODO: goroutine to avoid packet loss
+			MessageReceivedCallback(id, buf[0:n])
 		}
 	}(ServerAddr)
 	

@@ -9,6 +9,32 @@ import (
 
 var players []map[string]interface{}
 
+const leftAction string = "left"
+const upAction string = "up"
+const rightAction string = "right"
+const downAction string = "down"
+
+func PlayerMessage(id int, body []byte) {
+	var player map[string]interface{}
+	for i := range(players) {
+		if (players[i]["id"] == id) {
+			player = players[i]
+		}
+	}
+	if player == nil {
+		fmt.Println("should not happen unknown player: ", id)
+		return
+	}
+	
+	var message interface{}
+	err := json.Unmarshal(body, &message)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("player: ", id, " ; says: ", message)
+}
+
 func NewPlayer(id int) {
 	// TODO: thread safe (write)
 	n := len(players)
@@ -34,8 +60,9 @@ func LostPlayer(id int) {
 	// TODO: thread safe (write)
 	for i := range players {
 		if (players[i]["id"] == id) {
-			players[i] = players[len(players) - 1]
-			players[len(players) - 1] = nil
+			n := len(players) - 1
+			players[i] = players[n]
+			players = players[:n]
 		}
 	}
 }
