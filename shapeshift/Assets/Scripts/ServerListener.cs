@@ -6,6 +6,7 @@ using System.Text;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Globalization;
 
 public class ServerListener : MonoBehaviour {
 
@@ -29,28 +30,13 @@ public class ServerListener : MonoBehaviour {
     UdpClient client;
 
     // public
-    // public string IP = "127.0.0.1"; default local
-    public int port; // define > init
+    public string ip = "127.0.0.1";
+    public int port = 10002; // define > init
 
     // infos
     public string lastReceivedUDPPacket = "";
     public string allReceivedUDPPackets = ""; // clean up this from time to time!
 
-
-    // start from shell
-    private static void Main()
-    {
-        
-        ServerListener receiveObj = new ServerListener();
-        receiveObj.init();
-
-        string text = "";
-        do
-        {
-            text = Console.ReadLine();
-        }
-        while (!text.Equals("exit"));
-    }
     // start from unity3d
     public void Start()
     {
@@ -58,38 +44,12 @@ public class ServerListener : MonoBehaviour {
         init();
     }
 
-    // OnGUI
-    void OnGUI()
-    {
-        Rect rectObj = new Rect(40, 10, 200, 400);
-        GUIStyle style = new GUIStyle();
-        style.alignment = TextAnchor.UpperLeft;
-        GUI.Box(rectObj, "# UDPReceive\n127.0.0.1 " + port + " #\n"
-                    + "shell> nc -u 127.0.0.1 : " + port + " \n"
-                    + "\nLast Packet: \n" + lastReceivedUDPPacket
-                    + "\n\nAll Messages: \n" + allReceivedUDPPackets
-                , style);
-    }
-
     // init
-    private void init()
+    public void init()
     {
         // Endpunkt definieren, von dem die Nachrichten gesendet werden.
         print("UDPSend.init()");
 
-        // define port
-        port = 10002;
-
-        // status
-        print("Sending to 127.0.0.1 : " + port);
-        print("Test-Sending to this Port: nc -u 127.0.0.1  " + port + "");
-
-
-        // ----------------------------
-        // Abhören
-        // ----------------------------
-        // Lokalen Endpunkt definieren (wo Nachrichten empfangen werden).
-        // Einen neuen Thread für den Empfang eingehender Nachrichten erstellen.
         receiveThread = new Thread(
             new ThreadStart(ReceiveData));
         receiveThread.IsBackground = true;
@@ -108,7 +68,7 @@ public class ServerListener : MonoBehaviour {
             try
             {
                 // Bytes empfangen.
-                IPEndPoint anyIP = new IPEndPoint(IPAddress.Any, 0);
+                IPEndPoint anyIP = new IPEndPoint(IPAddress.Parse("ip"), port);
                 byte[] data = client.Receive(ref anyIP);
 
                 // Bytes mit der UTF8-Kodierung in das Textformat kodieren.
