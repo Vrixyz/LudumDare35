@@ -88,7 +88,7 @@ func LostPlayer(id int) {
 
 func Start() {
 	
-	// goroutine listens for players
+	// goroutine send data to players
     go func () {
 		for {
 			// TODO: thread safe (read)
@@ -100,7 +100,7 @@ func Start() {
 			if (err != nil) {
 				fmt.Println("Couldn't marshall player", err)
 			} else {
-				fmt.Println(data)
+				fmt.Println("sending: ", string(buf))
 				//fmt.Println(buf)
 				udpServer.Broadcast(buf)
 			}
@@ -115,7 +115,7 @@ func Start() {
 		// TODO: thread safe
 		for i := range players {
 			// TODO: optimize this shit
-			fmt.Println(players[i])
+			fmt.Println("moving: ", players[i])
 			players[i].Position.X = players[i].Position.X + (players[i].Speed.X * float32(elapsedTime.Seconds()))
 			players[i].Position.Y = players[i].Position.Y + (players[i].Speed.Y * float32(elapsedTime.Seconds()))
 		}

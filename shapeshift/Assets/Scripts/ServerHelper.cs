@@ -32,14 +32,25 @@ public class ServerHelper {
         serverSender.sendString(message + "\n");
     }
 
+
+    /// <summary>
+    /// Vector2 from my Go implementation
+    /// </summary>
+    [Serializable]
+    public class Vector2Go
+    {
+        public float X;
+        public float Y;
+    }
     /// <summary>
     /// Struct you receive to display a player
     /// </summary>
     [Serializable]
     public class Player
     {
-        public string name;
-        public Vector2 position;
+        public string Id;
+        public string Name;
+        public Vector2Go Position;
     }
     /// <summary>
     /// Struct you receive to display players
