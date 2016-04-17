@@ -128,7 +128,7 @@ func Start() {
  
 	go func(p_serverAddr *net.UDPAddr) {
 	    /* Now listen at selected port */
-		ServerConn, err := net.ListenUDP("udp", p_serverAddr)
+		ServerConn, err := net.ListenUDP("udp4", p_serverAddr)
 		CheckError(err)
 		defer ServerConn.Close()
 		buf := make([]byte, 1024)
