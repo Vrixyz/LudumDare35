@@ -10,7 +10,7 @@ public class ServerHelper {
     ServerSender serverSender = new ServerSender();
     ServerListener serverListener = new ServerListener();
 
-    public string ip = "127.0.0.1";  // define in init
+    public string ip = "192.168.1.3";  // define in init
     public int sendPort = 10003;  // define in init
     public int listenPort = 10002;  // define in init
 
