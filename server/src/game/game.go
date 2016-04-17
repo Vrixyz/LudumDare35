@@ -71,7 +71,7 @@ func NewPlayer(id int) {
     players[n] = Player{
 		id,
 		"Vrixyz",
-		Vector2{1, 2},
+		Vector2{1, 1},
 		Vector2{0, 0},
     }
 }
@@ -83,6 +83,7 @@ func LostPlayer(id int) {
 			n := len(players) - 1
 			players[i] = players[n]
 			players = players[:n]
+			break;
 		}
 	}
 }
@@ -113,12 +114,18 @@ func Start() {
 	for {
 		elapsedTime := time.Now().Sub(lastTick)
 		lastTick = time.Now()
+		var newPosX float64 = 0 // instantiation is heavy
+		var newPosY float64 = 0
 		// TODO: thread safe
 		for i := range players {
-			// TODO: optimize this shit
 			fmt.Println("moving: ", players[i])
-			players[i].Position.X = players[i].Position.X + (players[i].Speed.X * float64(elapsedTime.Seconds()))
-			players[i].Position.Y = players[i].Position.Y + (players[i].Speed.Y * float64(elapsedTime.Seconds()))
+			if (players[i].Speed.X != 0 || players[i].Speed.X != 0) {
+				newPosX = players[i].Position.X + (players[i].Speed.X * float64(elapsedTime.Seconds()))
+				newPosY = players[i].Position.Y + (players[i].Speed.Y * float64(elapsedTime.Seconds()))
+				newPosX, newPosY = maze.GetWalkable(players[i].Position.X, players[i].Position.Y, newPosX, newPosY)
+				players[i].Position.X = newPosX
+				players[i].Position.Y = newPosY
+			}
 		}
 		time.Sleep(time.Millisecond * 200)
 	}
