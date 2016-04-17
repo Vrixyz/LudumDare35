@@ -108,7 +108,7 @@ func maybeNewClient(addr *net.UDPAddr) int {
  
 	MyAddr, err := net.ResolveUDPAddr("udp", MyAddress)
 	CheckError(err)
-	Conn, err := net.DialUDP("udp", MyAddr, addr)
+	Conn, err := net.DialUDP("udp", addr, MyAddr)
 	CheckError(err)
 	newLen := 0
 	clients, newLen = extend(clients, Conn)
