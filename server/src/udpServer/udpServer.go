@@ -121,7 +121,7 @@ func Start() {
 	MyAddress = address + ":0"
 	fmt.Println( "my address: ", MyAddress)
     /* Lets prepare a address at any address at port 10003*/   
-    ServerAddr,err := net.ResolveUDPAddr("udp",":10003")
+    ServerAddr,err := net.ResolveUDPAddr("udp4",":10003")
     CheckError(err)
 	fmt.Println(ServerAddr)
  
