@@ -97,6 +97,7 @@ func Start() {
 			data := map[string]interface{}{
 					"players": players,
 					"time": time.Now(),
+					"type": "playersMessage",
 				}
 			buf, err := json.Marshal(data)
 			if (err != nil) {

@@ -10,9 +10,18 @@ public class ServerHelper {
     ServerSender serverSender = new ServerSender();
     ServerListener serverListener = new ServerListener();
 
-    public string ip = "163.172.27.180";  // define in init
+    public string ip = "127.0.0.1";  // define in init
     public int sendPort = 10003;  // define in init
     public int listenPort = 10002;  // define in init
+
+    /// <summary>
+    /// Struct you receive to display players
+    /// </summary>
+    [Serializable]
+    public class GenericMessage
+    {
+        public string type;
+    }
 
     public void init()
     {
@@ -20,8 +29,12 @@ public class ServerHelper {
         {
             string text = Encoding.UTF8.GetString(data);
 
-            PlayersMessage playersMessage = JsonUtility.FromJson<PlayersMessage>(text);
-            onReceivePlayersDelegate(playersMessage);
+            GenericMessage genericMessage = JsonUtility.FromJson<GenericMessage>(text);
+            if (genericMessage.type == "playersMessage")
+            {
+                PlayersMessage playersMessage = JsonUtility.FromJson<PlayersMessage>(text);
+                onReceivePlayersDelegate(playersMessage);
+            }
         };
 
         serverListener.init(ip, listenPort);

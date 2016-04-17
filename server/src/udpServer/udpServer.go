@@ -87,7 +87,6 @@ func extend(slice []*net.UDPAddr, element *net.UDPAddr) ([]*net.UDPAddr, int) {
 
 func deleteClient(id int) {
 	LostConnectionCallback(id)
-	//clients[id].Close()
 	clients[id] = nil
 }
 
@@ -106,12 +105,7 @@ func maybeNewClient(addr *net.UDPAddr) int {
 		}
 	}
 	fmt.Println("new client!");
-	//addr.Port = 10002
- 
-	//LocalAddr,err := net.ResolveUDPAddr("udp4","192.168.1.3:10002")
-	//CheckError(err)
-	//Conn, err := net.DialUDP("udp4", nil, addr)
-	//CheckError(err)
+
 	newLen := 0
 	clients, newLen = extend(clients, addr)
 	keepAlive[newLen] = time.Now()
