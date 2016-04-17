@@ -104,9 +104,9 @@ func maybeNewClient(addr *net.UDPAddr) int {
 		}
 	}
 	fmt.Println("new client!");
-	addr.Port = 10002
+	//addr.Port = 10002
  
-	LocalAddr,err := net.ResolveUDPAddr("udp4","192.168.1.3:10003")
+	LocalAddr,err := net.ResolveUDPAddr("udp4","192.168.1.3:10002")
 	CheckError(err)
 	Conn, err := net.DialUDP("udp4", LocalAddr, addr)
 	CheckError(err)
