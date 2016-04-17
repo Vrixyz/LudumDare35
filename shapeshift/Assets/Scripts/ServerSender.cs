@@ -25,13 +25,14 @@ public class ServerSender
    
     // "connection" things
     IPEndPoint remoteEndPoint;
-    UdpClient client;
+    public UdpClient client;
 
     // init
-    public void init(string ip, int port)
+    public void init(UdpClient p_client, string ip, int port)
     {
         remoteEndPoint = new IPEndPoint(IPAddress.Parse(ip), port);
-        client = new UdpClient();
+        client = p_client;
+        client.Connect(remoteEndPoint);
     }
  
     // sendData
@@ -42,11 +43,12 @@ public class ServerSender
                 //if (message != "")
                 //{
                     byte[] data = Encoding.UTF8.GetBytes(message);
-                    client.Send(data, data.Length, remoteEndPoint);
+                    client.Send(data, data.Length);
                 //}
         }
         catch (Exception err)
         {
+            Debug.Log(err);
             // TODO: handle this
         }
     }

@@ -18,7 +18,7 @@ public class ServerListener {
     Thread receiveThread;
 
     // udpclient object
-    UdpClient client;
+    public UdpClient client;
     
     string ip;
     int port; // define > init
@@ -28,7 +28,7 @@ public class ServerListener {
     {
         ip = p_ip;
         port = p_port;
-        
+        client = new UdpClient(p_port);
         receiveThread = new Thread(
             new ThreadStart(ReceiveData));
         receiveThread.IsBackground = true;
@@ -38,7 +38,6 @@ public class ServerListener {
     // receive thread
     private void ReceiveData()
     {
-        client = new UdpClient(port);
         while (true)
         {
 

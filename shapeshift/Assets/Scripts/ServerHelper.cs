@@ -23,9 +23,10 @@ public class ServerHelper {
             PlayersMessage playersMessage = JsonUtility.FromJson<PlayersMessage>(text);
             onReceivePlayersDelegate(playersMessage);
         };
-        serverListener.init(ip, listenPort);
 
-        serverSender.init(ip, sendPort);
+        serverListener.init(ip, listenPort);
+        serverSender.init(serverListener.client, ip, sendPort);
+        
     }
     public void sendString(string message)
     {

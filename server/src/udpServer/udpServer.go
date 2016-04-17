@@ -21,8 +21,10 @@ func CheckError(err error) {
     }
 }
 
-var clients []*net.UDPConn
+var clients []*net.UDPAddr
 var keepAlive [] time.Time // time last update
+
+var udpConn *net.UDPConn
 
 var MyAddress string
 
@@ -31,7 +33,7 @@ func Stop() {
 	// TODO: thread safe
 	for i := range clients {
 		if (clients[i] != nil) {
-			clients[i].Close()
+			//clients[i].Close()
 			clients[i] = nil
 		}
     }
@@ -41,8 +43,8 @@ func Broadcast(buf []byte) {
 	// TODO: thread safe
 	for i:= range clients {
 		if (clients[i] != nil) {
-			fmt.Println("sending: ", i, " for: ", clients[i].RemoteAddr())
-			_,err := clients[i].Write(buf)
+			fmt.Println("sending: ", i, " for: ", clients[i])
+			_,err := udpConn.WriteTo(buf, clients[i])
 			if err != nil {
 				fmt.Println(buf, err)
 			}
@@ -50,7 +52,7 @@ func Broadcast(buf []byte) {
 	}
 }
 
-func extend(slice []*net.UDPConn, element *net.UDPConn) ([]*net.UDPConn, int) {
+func extend(slice []*net.UDPAddr, element *net.UDPAddr) ([]*net.UDPAddr, int) {
     n := len(slice)
 	placeFound := n
 	for i := range clients {
@@ -67,7 +69,7 @@ func extend(slice []*net.UDPConn, element *net.UDPConn) ([]*net.UDPConn, int) {
 			// Slice is full; must grow.
 			// We double its size and add 1, so if the size is zero we still grow.
 			newCap := 2*n+1
-			newSlice := make([]*net.UDPConn, n, newCap)
+			newSlice := make([]*net.UDPAddr, n, newCap)
 			copy(newSlice, slice)
 			slice = newSlice
 			newKeepAlive := make([]time.Time, n, newCap)
@@ -85,7 +87,7 @@ func extend(slice []*net.UDPConn, element *net.UDPConn) ([]*net.UDPConn, int) {
 
 func deleteClient(id int) {
 	LostConnectionCallback(id)
-	clients[id].Close()
+	//clients[id].Close()
 	clients[id] = nil
 }
 
@@ -94,9 +96,9 @@ func maybeNewClient(addr *net.UDPAddr) int {
 	addrSimple := strings.Split(addr.String(), ":")[0];
 	for i:= range clients {
 		if (clients[i] != nil) {
-			clientSimpleAddr := strings.Split(clients[i].RemoteAddr().String(), ":")[0]
-			fmt.Println("addr: ", addrSimple , " ; client[", i, "]: ", clientSimpleAddr)
-			if (addrSimple == clientSimpleAddr) {
+			//clientSimpleAddr := strings.Split(clients[i].RemoteAddr().String(), ":")[0]
+			fmt.Println("addr: ", addrSimple , " ; client[", i, "]: ", clients[i].String())
+			if (addrSimple == clients[i].String()) {
 				fmt.Println("not a new client.")
 				keepAlive[i] = time.Now()
 				return i // we already saved this client
@@ -108,10 +110,10 @@ func maybeNewClient(addr *net.UDPAddr) int {
  
 	//LocalAddr,err := net.ResolveUDPAddr("udp4","192.168.1.3:10002")
 	//CheckError(err)
-	Conn, err := net.DialUDP("udp4", nil, addr)
-	CheckError(err)
+	//Conn, err := net.DialUDP("udp4", nil, addr)
+	//CheckError(err)
 	newLen := 0
-	clients, newLen = extend(clients, Conn)
+	clients, newLen = extend(clients, addr)
 	keepAlive[newLen] = time.Now()
 	NewConnectionCallback(newLen)
 	return newLen
@@ -132,6 +134,7 @@ func Start() {
 	    /* Now listen at selected port */
 		ServerConn, err := net.ListenUDP("udp4", p_serverAddr)
 		CheckError(err)
+		udpConn = ServerConn
 		defer ServerConn.Close()
 		buf := make([]byte, 1024)
 	 
