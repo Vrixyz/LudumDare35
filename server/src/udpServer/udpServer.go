@@ -24,6 +24,7 @@ func CheckError(err error) {
 var clients []*net.UDPConn
 var keepAlive [] time.Time // time last update
 
+var MyAddress string
 
 /// Very important so my sockets stay valid..
 func Stop() {
@@ -105,9 +106,9 @@ func maybeNewClient(addr *net.UDPAddr) int {
 	fmt.Println("new client!");
 	addr.Port = 10002
  
-	LocalAddr, err := net.ResolveUDPAddr("udp", "127.0.0.1:0")
+	MyAddr, err := net.ResolveUDPAddr("udp", MyAddress)
 	CheckError(err)
-	Conn, err := net.DialUDP("udp", LocalAddr, addr)
+	Conn, err := net.DialUDP("udp", MyAddr, addr)
 	CheckError(err)
 	newLen := 0
 	clients, newLen = extend(clients, Conn)
@@ -117,10 +118,13 @@ func maybeNewClient(addr *net.UDPAddr) int {
 }
 
 func Start() {
-	
+	address, err := ExternalIP()
+	CheckError(err)
+	MyAddress = address + ":0"
     /* Lets prepare a address at any address at port 10003*/   
     ServerAddr,err := net.ResolveUDPAddr("udp",":10003")
     CheckError(err)
+	fmt.Println(ServerAddr)
  
  
 	go func(p_serverAddr *net.UDPAddr) {
