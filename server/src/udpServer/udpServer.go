@@ -4,7 +4,6 @@ import (
     "fmt"
     "net"
     "os"
-	"strings"
 	"time"
 )
 
@@ -92,12 +91,12 @@ func deleteClient(id int) {
 
 func maybeNewClient(addr *net.UDPAddr) int {
 	// TODO: handle thrade safe
-	addrSimple := strings.Split(addr.String(), ":")[0];
+	//addrSimple := strings.Split(addr.String(), ":")[0];
 	for i:= range clients {
 		if (clients[i] != nil) {
 			//clientSimpleAddr := strings.Split(clients[i].RemoteAddr().String(), ":")[0]
-			fmt.Println("addr: ", addrSimple , " ; client[", i, "]: ", clients[i].String())
-			if (addrSimple == clients[i].String()) {
+			fmt.Println("addr: ", addr , " ; client[", i, "]: ", clients[i].String())
+			if (addr.String() == clients[i].String()) {
 				fmt.Println("not a new client.")
 				keepAlive[i] = time.Now()
 				return i // we already saved this client

@@ -58,15 +58,17 @@ func GetWalkable(currentX float64, currentY float64, x float64, y float64) (floa
 	// FIXME: this is the ugliest move function I've ever done
 	tryX := round(x, 0.5, 0)
 	tryY := round(y, 0.5, 0)
+	roundedCurrentX := round(currentX, 0.5, 0)
+	roundedCurrentY := round(currentY, 0.5, 0)
 	if (IsWalkable(maze.blocks[	int(tryX + 
 						tryY * float64(maze.w))])) {
 		return x, y
 	} else {
-		if (IsWalkable(maze.blocks[	int(currentX + 
+		if (IsWalkable(maze.blocks[	int(roundedCurrentX + 
 						tryY *	float64(maze.w))])) {
 			return currentX, y
 		} else if (IsWalkable(maze.blocks[	int(x + 
-						currentY *	float64(maze.w))])) {
+						roundedCurrentY *	float64(maze.w))])) {
 			return x, currentY
 		} else {
 			return currentX, currentY
