@@ -28,31 +28,29 @@ public class ServerListener {
     {
         ip = p_ip;
         port = p_port;
-
+        
         receiveThread = new Thread(
             new ThreadStart(ReceiveData));
         receiveThread.IsBackground = true;
         receiveThread.Start();
-
     }
-
+    int abort = 0;
     // receive thread
     private void ReceiveData()
     {
-
         client = new UdpClient(port);
         while (true)
         {
 
             try
             {
-                IPEndPoint serverIP = new IPEndPoint(IPAddress.Parse(ip), port);
+                IPEndPoint serverIP = new IPEndPoint(IPAddress.Any, 0);
                 byte[] data = client.Receive(ref serverIP);
                 onReceiveDelegate(data);
             }
             catch (Exception err)
             {
-                //TODO: handle
+                Debug.Log(err);
             }
         }
     }
