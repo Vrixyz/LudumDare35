@@ -6,7 +6,7 @@ using System;
 
 
 public class ServerHelperGUI : MonoBehaviour {
-    ServerHelper serverHelper = new ServerHelper();
+    public ServerHelper serverHelper = new ServerHelper();
 
     // gui
     string strMessage = "{\"Xspeed\":1}";

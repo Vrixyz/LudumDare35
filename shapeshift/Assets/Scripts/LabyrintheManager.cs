@@ -6,6 +6,9 @@ public class LabyrintheManager : MonoBehaviour
     public static CaseLab[,] lab;
     public static float CASE_SIZE = 1f;
 
+    public Material[] wallMats;
+    public Material[] grassMats;
+
     private GameObject player;
 
     private int countX;
@@ -46,6 +49,7 @@ public class LabyrintheManager : MonoBehaviour
                 }
                 else if (curr_value == 1)
                 {
+                    lab[i, j].element = createPathAtPosition(i, j);
                     lab[i, j].element = createWallAtPosition(i, j);
                 }
                 else if (curr_value == 2)
@@ -66,16 +70,20 @@ public class LabyrintheManager : MonoBehaviour
         go.transform.position = new Vector3(x + CASE_SIZE / 2, 0, z + CASE_SIZE / 2);
         //go.transform.position = new Vector3(x, 0, z);
         go.transform.localScale = Vector3.one * CASE_SIZE / 10;
+        Material mat = grassMats[Random.Range(0, grassMats.Length)];
+        go.GetComponent<MeshRenderer>().material = mat;
         return go;
     }
 
     private GameObject createWallAtPosition(float x, float z)
     {
-        GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube); 
         go.transform.SetParent(transform);
         go.transform.localScale = Vector3.one * CASE_SIZE;
-        go.transform.position = new Vector3(x + CASE_SIZE / 2, go.transform.localScale.y / 2, z + CASE_SIZE / 2);
+        go.transform.position = new Vector3(x + CASE_SIZE / 2, go.transform.localScale.z / 2, z + CASE_SIZE / 2);
         //go.transform.position = new Vector3(x, 0, z);
+        Material mat = wallMats[Random.Range(0, wallMats.Length)];
+        go.GetComponent<MeshRenderer>().material = mat;
         return go;
     }
 
