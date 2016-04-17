@@ -121,6 +121,7 @@ func Start() {
 	address, err := ExternalIP()
 	CheckError(err)
 	MyAddress = address + ":0"
+	fmt.Println(MyAddress)
     /* Lets prepare a address at any address at port 10003*/   
     ServerAddr,err := net.ResolveUDPAddr("udp",":10003")
     CheckError(err)
